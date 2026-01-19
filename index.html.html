@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yerin's Book Bistro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Pretendard:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4F1EA; /* 종이 질감 색상 */
+            --ink-color: #2C3E50;
+            --accent-green: #264653;
+            --accent-gold: #B88A4D; /* 가독성을 위해 조금 더 밝게 조정 */
+            --line-color: #D4CFC0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color); /* 배경 자체를 종이색으로 통일 */
+            color: var(--ink-color);
+            margin: 0;
+            padding: 0;
+            font-family: 'Gowun Batang', serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 모바일 화면 폭에 맞춘 컨테이너 (최대 450px) */
+        .mobile-container {
+            width: 100%;
+            max-width: 480px; /* 일반적인 스마트폰 Max 폭 */
+            padding: 30px 20px; /* 모바일에 최적화된 패딩 */
+            background-color: var(--bg-color);
+            min-height: 100vh;
+        }
+
+        /* 헤더 디자인 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--ink-color);
+        }
+        
+        .brand-slogan {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-gold);
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem; /* 모바일에서 임팩트 있게 */
+            font-weight: 700;
+            color: var(--accent-green);
+            margin: 0;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .welcome-msg {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 15px;
+            line-height: 1.5;
+            word-break: keep-all;
+        }
+
+        /* 코스 타이틀 */
+        .course-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 40px;
+            margin-bottom: 25px;
+        }
+        
+        .course-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            padding: 0 15px;
+            background: var(--bg-color);
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 구분선 테크닉 */
+        .course-line {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background-color: #ccc;
+            z-index: 0;
+        }
+
+        /* 메뉴 아이템 */
+        .menu-item {
+            margin-bottom: 35px;
+            background: #fff; /* 카드 느낌을 주기 위해 흰색 배경 추가 */
+            padding: 20px;
+            border-radius: 12px; /* 둥근 모서리 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 살짝 떠있는 느낌 */
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .menu-top-line {
+            margin-bottom: 12px;
+            border-bottom: 1px dashed var(--line-color);
+            padding-bottom: 10px;
+        }
+
+        .book-title {
+            display: block;
+            font-size: 1.25rem; /* 제목 크게 */
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+        
+        .book-tag {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .chef-badge {
+            display: inline-block;
+            background-color: var(--accent-green);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+            position: relative;
+            top: -2px;
+        }
+
+        .tasting-note {
+            font-size: 1rem; /* 본문 폰트 키움 (가독성 핵심) */
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
+        }
+
+        /* 페어링 박스 디자인 */
+        .pairing-box {
+            background-color: #F9F7F2;
+            border-left: 3px solid var(--accent-gold);
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .pairing-label {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .pairing-q {
+            font-family: 'Gowun Batang', serif;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 4px;
+            word-break: keep-all;
+        }
+
+        .pairing-sub {
+            font-size: 0.9rem;
+            color: #777;
+            font-family: 'Pretendard', sans-serif;
+            display: block;
+            line-height: 1.4;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <header>
+            <div class="brand-slogan">Selected for Yerin</div>
+            <h1 class="brand-logo">Book Bistro</h1>
+            <p class="welcome-msg">
+                "손님, 주문하시겠습니까?<br>
+                맛보기 전엔 나갈 수 없습니다."
+            </p>
+        </header>
+
+        <div class="course-section">
+            <div class="course-line"></div>
+            <span class="course-title">Starter</span>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">칵테일, 러브, 좀비</span>
+                <span class="book-tag">Trendy / Horror</span>
+            </div>
+            <div class="tasting-note">
+                지금 가장 힙한 작가가 말아주는 기묘한 맛. 좀비가 된 아빠가 TV만 본다면? 신고할까, 몰래 키울까? 웃긴데 묘하게 서늘하고 슬픈 이야기.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"가족이 무해한 괴물이 된다면?"</span>
+                <span class="pairing-sub">(징그러운 좀비 아빠 vs 잔소리꾼 인간 아빠, 예린이의 선택은?)</span>
+            </div>
+        </div>
+
+        <div class="course-section">
+            <div class="course-line"></div>
+            <span class="course-title">Signature</span>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">비스킷 <span class="chef-badge">CHEF PICK</span></span>
+                <span class="book-tag">Mystery / Fantasy</span>
+            </div>
+            <div class="tasting-note">
+                제2의 아몬드! 존재감이 없어 투명해진 아이들의 소리가 들린다. 친구가 완전히 사라지기 전에 구해낼 수 있을까?
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"투명 인간 vs 슈퍼 관종"</span>
+                <span class="pairing-sub">(아무도 날 신경 안 쓰는 것 vs 모두가 나만 쳐다보는 것)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">죽이고 싶은 아이</span>
+                <span class="book-tag">Thriller</span>
+            </div>
+            <div class="tasting-note">
+                죽은 단짝 친구와 기억을 잃은 나. 모두가 나를 범인이라 할 때 발견된 일기장. 과연 그 안에 적힌 진실은?
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"세상이 널 안 믿어줄 때"</span>
+                <span class="pairing-sub">(기억이 없는데도 "난 결백해"라고 끝까지 외칠 수 있을까?)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">스노볼</span>
+                <span class="book-tag">Dystopia</span>
+            </div>
+            <div class="tasting-note">
+                영하 41도의 밖, 따뜻한 안. 낙원에 들어가려 죽은 스타를 연기한다. 하지만 그곳은 카메라가 가득한 감옥이었다.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"감시받는 부자 vs 자유로운 거지"</span>
+                <span class="pairing-sub">(내 사생활이 생중계되는 대신 평생 놀고먹을 수 있다면?)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">나인</span>
+                <span class="book-tag">Mystery</span>
+            </div>
+            <div class="tasting-note">
+                학교 화단에서 발견된 뼈. 식물들이 속삭인다. "우리는 범인의 얼굴을 봤어." 보랏빛 미스터리 추리극.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"식물은 다 보고 있었다면?"</span>
+                <span class="pairing-sub">(우리 집 화분은 나의 어떤 비밀을 알고 있을까?)</span>
+            </div>
+        </div>
+
+        <div class="course-section">
+            <div class="course-line"></div>
+            <span class="course-title">Soul Food</span>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">페인트</span>
+                <span class="book-tag">Growth</span>
+            </div>
+            <div class="tasting-note">
+                부모를 면접 보고 뽑는 세상. 완벽한 부모가 나타났는데 왜 망설일까? 통쾌한 역발상 드라마.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"부모님 면접 본다면 몇 점?"</span>
+                <span class="pairing-sub">(엄마 아빠 면접 볼 때 꼭 하고 싶은 '압박 질문' 하나는?)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">세계를 건너 너에게 갈게</span>
+                <span class="book-tag">Tearjerker</span>
+            </div>
+            <div class="tasting-note">
+                1년 뒤 도착하는 편지에 1982년에서 답장이 왔다. 편지를 주고받으며 밝혀지는 기적 같은 인연.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"과거로 편지를 쓴다면?"</span>
+                <span class="pairing-sub">(20년 전의 어린 엄마에게 편지를 보낼 수 있다면?)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">순례 주택</span>
+                <span class="book-tag">Drama</span>
+            </div>
+            <div class="tasting-note">
+                쫄딱 망해 이사 온 빌라 주인 할머니가 우리 집보다 힙하다? 철부지 가족들의 참교육 성장기.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"돈 많은 철부지 vs 멋진 어른"</span>
+                <span class="pairing-sub">(예린이가 생각하는 '진짜 멋진 어른'은?)</span>
+            </div>
+        </div>
+
+        <div class="course-section">
+            <div class="course-line"></div>
+            <span class="course-title">Dessert</span>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">달러구트 꿈 백화점</span>
+                <span class="book-tag">Healing</span>
+            </div>
+            <div class="tasting-note">
+                잠들어야만 입장 가능한 상점가. 원하는 꿈을 팝니다. 값은 설렘으로 받아요. 달콤한 판타지.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"여기서 꿈 하나 산다면?"</span>
+                <span class="pairing-sub">(이모는 로또 당첨 꿈 살 건데, 넌 뭐 살래?)</span>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="menu-top-line">
+                <span class="book-title">메리골드 마음 세탁소</span>
+                <span class="book-tag">Healing</span>
+            </div>
+            <div class="tasting-note">
+                슬픈 기억을 깨끗하게 빨아드립니다. 지우고 싶은 흑역사가 있다면 이곳에 맡기세요.
+            </div>
+            <div class="pairing-box">
+                <span class="pairing-label">Pairing</span>
+                <span class="pairing-q">"지우고 싶은 기억 1위는?"</span>
+                <span class="pairing-sub">(딱 하나의 기억을 세탁기에 돌릴 수 있다면?)</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
