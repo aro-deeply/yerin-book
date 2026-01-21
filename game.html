@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Bistro: Balance Game</title>
+    <!-- 고급스러운 폰트 로드: Playfair Display(영문), 프리텐다드(한글 고딕), 고운바탕(한글 명조) -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Pretendard:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F4F1EA; /* 샌드 베이지 (종이 질감) */
+            --text-main: #2C2C2C; /* 짙은 차콜 */
+            --text-sub: #666666;
+            --accent-green: #264653; /* 성수동 딥 그린 */
+            --accent-gold: #B88A4D; /* 고급스러운 브론즈 */
+            --line-color: #D4CFC0;
+            --card-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Gowun Batang', serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px; /* 모바일~태블릿 최적화 */
+            padding: 40px 20px;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* --- 공통 UI 요소 --- */
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 버튼 스타일 리뉴얼: 심플 & 모던 */
+        .btn {
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 16px 0;
+            width: 100%;
+            font-size: 1rem;
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background-color: #1a333e;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            margin-top: 10px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--accent-green);
+            color: white;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--accent-green);
+            font-family: 'Pretendard', sans-serif;
+            font-size: 1rem;
+            resize: none;
+            border-radius: 0;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-bottom: 2px solid var(--accent-gold);
+        }
+
+        /* --- 1. 시작 화면 (Intro) --- */
+        .intro-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .brand-slogan {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-gold);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 40px;
+            background: var(--accent-gold);
+            margin: 20px auto;
+        }
+
+        .user-select-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 40px 0;
+        }
+
+        .user-card {
+            background: white;
+            border: 1px solid var(--line-color);
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover, .user-card.selected {
+            border-color: var(--accent-green);
+            background-color: #F0F4F5;
+        }
+
+        .user-initial {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .user-name {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        /* --- 2. 게임 화면 (Game) --- */
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .round-info {
+            font-family: 'Playfair Display', serif;
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.4;
+            word-break: keep-all;
+            color: var(--accent-green);
+        }
+
+        .choice-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-card {
+            background: white;
+            border: 1px solid transparent;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        }
+
+        .choice-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .choice-card.selected {
+            border: 1px solid var(--accent-green);
+            background-color: #F7F9F9;
+        }
+        
+        .choice-card.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .choice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .choice-tag {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+        }
+
+        .choice-title {
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .choice-desc {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* --- 3. 이유 입력 (Reason) --- */
+        .reason-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .selected-display {
+            font-family: 'Pretendard', sans-serif;
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* --- 4. 기록 보기 (History) --- */
+        .history-list {
+            margin-top: 30px;
+            border-top: 1px solid var(--line-color);
+        }
+
+        .history-item {
+            padding: 25px 0;
+            border-bottom: 1px solid var(--line-color);
+        }
+
+        .history-round {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .history-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .history-row {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .h-user {
+            width: 60px;
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-green);
+        }
+
+        .h-content {
+            flex: 1;
+        }
+
+        .h-choice {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .h-reason {
+            font-family: 'Pretendard', sans-serif;
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        /* 유틸리티 */
+        .text-center { text-align: center; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- 1. 시작 화면 -->
+    <div id="screen-start" class="screen active">
+        <div class="intro-header">
+            <div class="brand-slogan">For Yerin's Reading Club</div>
+            <h1 class="brand-logo">Book Bistro</h1>
+            <div class="divider"></div>
+            <p style="font-size: 0.9rem; color: #777;">
+                오늘의 선택을 기록해두세요.<br>
+                책을 덮은 뒤, 우리의 생각이 어떻게 변했는지<br>확인할 수 있도록요.
+            </p>
+        </div>
+        
+        <div class="text-center">
+            <p style="font-family:'Pretendard'; font-size:0.8rem; color:#999; letter-spacing:1px;">WHO ARE YOU?</p>
+            <div class="user-select-area">
+                <div class="user-card" onclick="selectUser('예린')">
+                    <span class="user-initial">Y</span>
+                    <span class="user-name">예린</span>
+                </div>
+                <div class="user-card" onclick="selectUser('엄마')">
+                    <span class="user-initial">B</span>
+                    <span class="user-name">엄마</span>
+                </div>
+                <div class="user-card" onclick="selectUser('이모')">
+                    <span class="user-initial">M</span>
+                    <span class="user-name">이모</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-outline" onclick="showHistory()" style="font-size: 0.9rem;">VIEW HISTORY (기록장)</button>
+    </div>
+
+    <!-- 2. 게임 화면 -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <span class="round-info" id="round-badge">ROUND 01</span>
+            <div class="question-text" id="question-text">질문 내용이 들어갑니다</div>
+        </div>
+
+        <div class="choice-container">
+            <!-- Option A -->
+            <div class="choice-card" id="card-a" onclick="makeChoice('A')">
+                <div class="choice-header">
+                    <span class="choice-tag">Option A.</span>
+                    <span class="choice-title" id="title-a">타이틀</span>
+                </div>
+                <p class="choice-desc" id="desc-a">설명</p>
+            </div>
+
+            <!-- Option B -->
+            <div class="choice-card" id="card-b" onclick="makeChoice('B')">
+                <div class="choice-header">
+                    <span class="choice-tag">Option B.</span>
+                    <span class="choice-title" id="title-b">타이틀</span>
+                </div>
+                <p class="choice-desc" id="desc-b">설명</p>
+            </div>
+        </div>
+
+        <div class="text-center" style="margin-top: 30px;">
+            <a href="#" onclick="location.reload()" style="color:#999; text-decoration:none; font-size:0.8rem;">← MAIN MENU</a>
+        </div>
+    </div>
+
+    <!-- 3. 이유 입력 화면 -->
+    <div id="screen-reason" class="screen">
+        <div class="reason-header">
+            <span style="font-family:'Playfair Display'; font-style:italic; color:var(--accent-gold);">Why did you choose?</span>
+            <span class="selected-display" id="selected-choice-display">...</span>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <textarea id="reason-input" rows="3" placeholder="선택의 이유를 짧게 남겨주세요. (나중에 보면 재밌어요!)"></textarea>
+        </div>
+        
+        <button class="btn" onclick="saveAndNext()">NEXT ROUND</button>
+    </div>
+
+    <!-- 4. 완료 화면 -->
+    <div id="screen-finish" class="screen text-center">
+        <div class="intro-header">
+            <h1 class="brand-logo" style="font-size:2.5rem;">Saved.</h1>
+            <div class="divider"></div>
+            <p style="margin-bottom: 40px; color:#555;">
+                오늘의 기록이 저장되었습니다.<br>
+                다른 멤버도 기록을 남겨보세요.
+            </p>
+        </div>
+        <button class="btn" onclick="location.reload()">처음으로 돌아가기</button>
+        <button class="btn btn-outline" onclick="showHistory()">기록장 열어보기</button>
+    </div>
+
+    <!-- 5. 기록 보기 (History) -->
+    <div id="screen-history" class="screen">
+        <div class="text-center">
+            <h2 style="font-family:'Playfair Display'; color:var(--accent-green); margin-bottom:5px;">Reading Log</h2>
+            <p style="font-size:0.8rem; color:#999;">우리의 선택과 생각들</p>
+        </div>
+        
+        <div id="history-list" class="history-list">
+            <!-- 데이터 삽입 영역 -->
+            <p class="text-center" style="padding:40px; color:#999;">아직 기록이 없습니다.</p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="btn" onclick="location.reload()">BACK</button>
+            <button class="btn btn-outline" onclick="clearHistory()" style="border:none; color:#ccc; font-size:0.8rem; margin-top:5px;">RESET DATA</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- 데이터 (이전과 동일) ---
+    const gameData = [
+        {
+            id: "round1",
+            round: "Round 01. Relationship (체리새우)",
+            question: "나에게 주어진 두 가지 삶,\n당신의 선택은?",
+            optionA: { title: "가짜 인싸", desc: "친구 많고 인기도 최고! 하지만 비위 맞추느라 진짜 내 모습은 평생 숨겨야 함." },
+            optionB: { title: "당당한 아싸", desc: "친구는 거의 없어서 외로움. 하지만 남 눈치 안 보고 내 취향대로 자유롭게 삼." }
+        },
+        {
+            id: "round2",
+            round: "Round 02. Family (순례주택)",
+            question: "평생 함께 살아야 할\n가족을 고른다면?",
+            optionA: { title: "콩가루 부잣집", desc: "돈 무제한 지원. 하지만 매일 소리 지르며 싸우고 서로 무시함." },
+            optionB: { title: "가난한 화목집", desc: "돈 없어서 아껴 써야 함. 하지만 서로 끔찍이 아끼고 내 편이 되어줌." }
+        },
+        {
+            id: "round3",
+            round: "Round 03. Survival (스노볼)",
+            question: "생존이 걸린 문제,\n어디서 살겠습니까?",
+            optionA: { title: "감시당하는 호화생활", desc: "5성급 호텔급 대우. 단, 24시간 내 사생활이 전 세계 생중계됨." },
+            optionB: { title: "자유로운 야생", desc: "내일 얼어 죽을 수도 있는 추위. 하지만 누구의 간섭도 없는 완벽한 자유." }
+        }
+    ];
+
+    let currentUser = "";
+    let currentRoundIndex = 0;
+    let currentChoice = "";
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        setTimeout(() => {
+            document.getElementById(screenId).classList.add('active');
+        }, 100);
+    }
+
+    function selectUser(user) {
+        currentUser = user;
+        currentRoundIndex = 0;
+        loadRound();
+        showScreen('screen-game');
+    }
+
+    function loadRound() {
+        const data = gameData[currentRoundIndex];
+        document.getElementById('round-badge').innerText = data.round;
+        document.getElementById('question-text').innerText = data.question;
+        
+        document.getElementById('title-a').innerText = data.optionA.title;
+        document.getElementById('desc-a').innerText = data.optionA.desc;
+
+        document.getElementById('title-b').innerText = data.optionB.title;
+        document.getElementById('desc-b').innerText = data.optionB.desc;
+
+        document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected', 'disabled'));
+    }
+
+    function makeChoice(choice) {
+        currentChoice = choice;
+        
+        const selected = document.getElementById(choice === 'A' ? 'card-a' : 'card-b');
+        const other = document.getElementById(choice === 'A' ? 'card-b' : 'card-a');
+        
+        selected.classList.add('selected');
+        other.classList.add('disabled');
+
+        const data = gameData[currentRoundIndex];
+        const choiceTitle = choice === 'A' ? data.optionA.title : data.optionB.title;
+        
+        document.getElementById('selected-choice-display').innerText = choiceTitle;
+        document.getElementById('reason-input').value = "";
+
+        setTimeout(() => {
+            showScreen('screen-reason');
+            document.getElementById('reason-input').focus();
+        }, 500);
+    }
+
+    function saveAndNext() {
+        const reason = document.getElementById('reason-input').value;
+        const roundId = gameData[currentRoundIndex].id;
+        const data = gameData[currentRoundIndex];
+        const choiceTitle = currentChoice === 'A' ? data.optionA.title : data.optionB.title;
+
+        let history = JSON.parse(localStorage.getItem('bookBistroHistory_v2')) || {};
+        
+        if (!history[roundId]) history[roundId] = [];
+        history[roundId] = history[roundId].filter(item => item.user !== currentUser);
+        
+        history[roundId].push({
+            user: currentUser,
+            choice: choiceTitle,
+            reason: reason || "-"
+        });
+
+        localStorage.setItem('bookBistroHistory_v2', JSON.stringify(history));
+
+        currentRoundIndex++;
+        if (currentRoundIndex < gameData.length) {
+            loadRound();
+            showScreen('screen-game');
+        } else {
+            showScreen('screen-finish');
+        }
+    }
+
+    function showHistory() {
+        const history = JSON.parse(localStorage.getItem('bookBistroHistory_v2'));
+        const container = document.getElementById('history-list');
+        container.innerHTML = "";
+
+        if (!history) {
+            container.innerHTML = '<p class="text-center" style="padding:40px; color:#999;">아직 기록이 없습니다.</p>';
+            showScreen('screen-history');
+            return;
+        }
+
+        gameData.forEach(round => {
+            const records = history[round.id];
+            if (records && records.length > 0) {
+                const roundBox = document.createElement('div');
+                roundBox.className = 'history-item';
+                
+                let html = `<div class="history-round">${round.round}</div><div class="history-grid">`;
+                
+                records.forEach(rec => {
+                    html += `
+                        <div class="history-row">
+                            <div class="h-user">${rec.user}</div>
+                            <div class="h-content">
+                                <div class="h-choice">${rec.choice}</div>
+                                <div class="h-reason">${rec.reason}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                roundBox.innerHTML = html;
+                container.appendChild(roundBox);
+            }
+        });
+
+        showScreen('screen-history');
+    }
+
+    function clearHistory() {
+        if(confirm("모든 기록을 삭제하시겠습니까?")) {
+            localStorage.removeItem('bookBistroHistory_v2');
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
